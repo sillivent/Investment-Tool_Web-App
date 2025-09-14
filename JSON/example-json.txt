@@ -1,0 +1,69 @@
+{
+	"position": [
+    {
+        "Symbol": "SCHD", //Found in cell A12
+        "Name": "Schwab U.S. Dividend Equity ETF",
+        "Aggregate Position": [
+            {
+                "Last Price $": "27.485", //Found in cell B12
+                "Value $": "691.1928", //Found in cell C12
+                "Change $": "-0.23", //Found in cell D12
+                "Change %": "-0.85", //Found in cell E12
+                "% of Portfolio": "12.6167", //Found in cell F12
+                "Qty #": "25.148", //Found in cell G12
+                "Cost/Share": "26.3198", //Found in cell H12
+                "Day's Gain $": "-5.9098", //Found in cell I12
+                "Total Gain $": "29.3028", //Found in cell J12
+                "Total Gain %": "4.4271", //Found in cell K12
+                "YTD Gain %": "4.43", //Found in cell L12
+                "Dividend Yield %": "3.6977", //Found in cell M12
+                "Est. Annual Income": "26.17", //Found in cell N12
+                "Ex-Div Date": "6/25/2025", //Found in cell O12
+                "Dividend Pay Date": "6/30/2025", //Found in cell P12
+                "Dividend": "0.2602" //Found in cell Q12
+            }
+        ]
+        "Transaction Data": [
+            {	
+                "Number": "1",
+                "Date": "04/10/2025", //Found in cell A13
+                "Last Price $": "27.485", //Found in cell B13
+                "Value $": "54.97", //Found in cell C13
+                "Change $": "-0.23", //Found in cell D13
+                "Change %": "-0.85", //Found in cell E13
+                "% of Portfolio": "1.0034", //Found in cell F13
+                "Qty #": "2", //Found in cell G13
+                "Cost/Share": "24.9", //Found in cell H13
+                "Day's Gain $": "-0.47", //Found in cell I13
+                "Total Gain $": "5.17", //Found in cell J13
+                "Total Gain %": "10.3815", //Found in cell K13
+                "YTD Gain %": "10.3815", //Found in cell L13
+                "Dividend Yield %": "3.6977", //Found in cell M13
+                "Est. Annual Income": "2.08", //Found in cell N13
+                "Ex-Div Date": "6/25/2025", //Found in cell O13
+                "Dividend Pay Date": "6/30/2025", //Found in cell P13
+                "Dividend": "0.2602" //Found in cell Q13
+            },
+            {
+                "Number": "2",
+                "Date": "04/21/2025", //Found in cell A14
+                "Last Price $": "27.485", //Found in cell B14
+                "Value $": "54.97", //Found in cell C14
+                "Change $": "-0.23", //Found in cell D14
+                "Change %": "-0.85", //Found in cell E14
+                "% of Portfolio": "1.0034", //Found in cell F14
+                "Qty #": "2", //Found in cell G14
+                "Cost/Share": "24.83", //Found in cell H14
+                "Day's Gain $": "-0.47", //Found in cell I14
+                "Total Gain $": "5.31", //Found in cell J14
+                "Total Gain %": "10.6927", //Found in cell K14
+                "YTD Gain %": "10.6927", //Found in cell L14
+                "Dividend Yield %": "3.6977", //Found in cell M14
+                "Est. Annual Income": "2.08", //Found in cell N14
+                "Ex-Div Date": "6/25/2025", //Found in cell O14
+                "Dividend Pay Date": "6/30/2025", //Found in cell P14
+                "Dividend": "0.2602" //Found in cell Q14
+            }
+        ]
+    ] 
+}
