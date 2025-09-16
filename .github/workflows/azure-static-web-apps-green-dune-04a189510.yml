@@ -3,11 +3,11 @@ name: Azure Static Web Apps CI/CD
 on:
   push:
     branches:
-      - main
+      - Investment-Tool_Web-App
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches:
-      - main
+      - Investment-Tool_Web-App
 
 jobs:
   build_and_deploy_job:
@@ -44,3 +44,4 @@ jobs:
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_GREEN_DUNE_04A189510 }}
           action: "close"
+
