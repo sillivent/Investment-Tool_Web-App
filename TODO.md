@@ -1,0 +1,5 @@
+- [x] Add AI-themed favicon to frontend/index.html
+- [x] Add AI-themed favicon to frontend/portfolioUpload.html
+- [x] Add AI-themed favicon to frontend/editable_table.html
+- [x] Add AI-themed favicon to frontend/test_static.html
+- [x] Test the favicon by running the server and checking browser tabs

@@ -1,0 +1,79 @@
+// get_EquityInfo.js
+export async function getEquityInfo(symbol) {
+  const response = await fetch(`http://localhost:3000/api/equity/${symbol}`);
+  if (!response.ok) throw new Error("Failed to fetch equity info");
+  const data = await response.json();
+  return data;
+}
+
+export async function getEquityInfo(ticker) {
+  try {
+    // Fetch basic quote info first
+    const quote = await yahooFinance.quote(ticker);
+
+    let data = {
+      symbol: quote.symbol,
+      name: quote.shortName || quote.longName,
+      price: quote.regularMarketPrice,
+      marketCap: quote.marketCap,
+      volume: quote.regularMarketVolume,
+      peRatio: quote.trailingPE,
+    };
+
+    // Detect asset type
+    // quote.quoteType can be: "EQUITY", "ETF", "OPTION", "MUTUALFUND", etc.
+    const type = (quote.quoteType || "").toUpperCase();
+
+    if (type === "EQUITY" || type === "ETF") {
+      // Add dividend info
+      data = {
+        ...data,
+        type,
+        dividendYield: quote.dividendYield, // fraction (0.02 = 2%)
+        dividendRate: quote.trailingAnnualDividendRate,
+        exDividendDate: quote.exDividendDate
+          ? new Date(quote.exDividendDate * 1000).toISOString().split("T")[0]
+          : null,
+      };
+
+      // Fetch dividend history
+      const dividends = await yahooFinance.historical(ticker, {
+        period1: "2015-01-01",
+        events: "dividends",
+      });
+
+      const recentDividends = dividends
+        .slice(-5)
+        .map(d => ({
+          date: d.date.toISOString().split("T")[0],
+          amount: d.dividends,
+        }));
+
+      data.recentDividends = recentDividends;
+    } else if (type === "OPTION") {
+      // Fetch option chain
+      const options = await yahooFinance.options(ticker);
+      data = {
+        ...data,
+        type,
+        expirations: options.expirationDates,
+        calls: options.options[0]?.calls || [],
+        puts: options.options[0]?.puts || [],
+      };
+    } else {
+      data.type = type || "UNKNOWN";
+    }
+
+    return data;
+  } catch (err) {
+    console.error(`Error fetching data for ${ticker}:`, err);
+    return null;
+  }
+}
+
+// Example usage
+(async () => {
+  console.log(await getEquityInfo("AAPL"));  // Stock
+  console.log(await getEquityInfo("VOO"));   // ETF
+  console.log(await getEquityInfo("AAPL240920C00190000")); // Option (AAPL $190 Call exp 2024-09-20)
+})();

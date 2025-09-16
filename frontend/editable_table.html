@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Trading Tools V1</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>" type="image/svg+xml">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css" />
+    <link rel="stylesheet" href="base.css" />
+    <!-- SheetJS for reading XLSX files -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <!-- FileSaver.js for saving files -->
+    <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            table-layout: fixed; /* Ensure columns are fixed width */
+        }
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 6px;
+            text-align: center;
+            word-wrap: break-word; /* Allow word wrapping if needed */
+        }
+        th {
+            min-width: 80px; /* Set minimum width for headers */
+        }
+        input {
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .collapsed td:nth-child(n+11),
+        .collapsed th:nth-child(n+11) {
+            display: none; /* Hide columns 11 and beyond */
+        }
+        main {
+            width: 100%; /* Allow main to expand to full width */
+            max-width: none; /* Remove max-width to allow full expansion */
+        }
+        .download-buttons {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="ticker">
+        <div class="index" id="dow">
+            <span class="name">DOW</span>
+            <span class="ticker">DJIA</span>
+            <span class="value" id="dow-value">Loading...</span>
+            <span class="change day" id="dow-day">+0.00%</span>
+            <span class="change month" id="dow-month">+0.00%</span>
+            <span class="change year" id="dow-year">+0.00%</span>
+        </div>
+        <div class="index" id="sp500">
+            <span class="name">S&P 500</span>
+            <span class="ticker">SPX</span>
+            <span class="value" id="sp500-value">Loading...</span>
+            <span class="change day" id="sp500-day">-0.00%</span>
+            <span class="change month" id="sp500-month">+0.00%</span>
+            <span class="change year" id="sp500-year">+0.00%</span>
+        </div>
+        <div class="index" id="nasdaq">
+            <span class="name">NASDAQ</span>
+            <span class="ticker">IXIC</span>
+            <span class="value" id="nasdaq-value">Loading...</span>
+            <span class="change day" id="nasdaq-day">+0.00%</span>
+            <span class="change month" id="nasdaq-month">+0.00%</span>
+            <span class="change year" id="nasdaq-year">+0.00%</span>
+        </div>
+    </div>
+    <header>
+        <h1>Build Your Portfolio</h1>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#contact">Contact</a></li>
+            <li class="active"><a href="portfolioUpload.html">Upload Your Porfolio</a></li>
+            <li class="active"><a href="editable_table.html">Create Your Portfolio</a></li>
+        </ul>
+        <div class="hamburger-menu">
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+        </div>
+    </nav>
+
+    <section id="instructions" style="margin: 20px; padding: 10px; border: 1px solid #ccc; background-color: #f9f9f9; color: darkgreen;">
+        <h2>Portfolio Table Instructions</h2>
+        <p>
+            Use this table to build and manage your investment portfolio. Enter ticker symbols to fetch live equity data.
+            Adjust quantities and prices to calculate cost basis and dividend yields automatically.
+            The "Value" column shows the current market value of your holdings (Quantity × Current Price).
+            Use the buttons below to add rows, toggle extra columns, and download your portfolio data in JSON or CSV formats.
+        </p>
+    </section>
+
+    <main>
+        <button id="addRowBtn">➕ Add Row</button>
+        <button id="toggleColumnsBtn">📊 Toggle Extra Columns</button>
+
+        <table id="portfolioTable">
+            <thead>
+                <tr>
+                    <th>Ticker Symbol</th>
+                    <th>Transaction Date</th>
+                    <th>Current Price</th>
+                    <th>Change in Value</th>
+                    <th>Price Paid</th>
+                    <th>Quantity</th>
+                    <th>Value</th>
+                    <th>Cost Basis</th>
+                    <th>Dividend Yield</th>
+                    <th>Dividend Yield on Costs</th>
+                    <th>Dividend Frequency</th>
+                    <th>Dividend Payout</th>
+                    <th>Total Dividend Payout</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+        <h3>Aggregate Totals</h3>
+        <table id="aggregateTable">
+            <thead>
+                <tr>
+                    <th>Total Quantity</th>
+                    <th>Total Cost Basis</th>
+                    <th>Portfolio's Average Dividend Payout</th>
+                    <th>Total Value</th>
+                    <th>Total Dividend Annual Income</th>
+                    <th>Portfolio's Dividend Yield on Costs</th>
+                    <th>Portfolio's Dividend Yield</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+        <div class="download-buttons">
+            <button id="downloadPortfolioJsonBtn">Download Portfolio JSON</button>
+            <button id="downloadPortfolioCsvBtn">Download Portfolio CSV</button>
+            <button id="downloadAggregateJsonBtn">Download Aggregate JSON</button>
+            <button id="downloadAggregateCsvBtn">Download Aggregate CSV</button>
+        </div>
+
+<script type="module" src="/editable_table.js"></script>
+<script type="module" src="/csv_json_download.js"></script>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Synthintellectus V1. All rights reserved.</p>
+    </footer>
+</body>
+</html>
