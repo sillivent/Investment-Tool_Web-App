@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://green-dune-04a189510.1.azurestaticapps.net/sitemap.xml
