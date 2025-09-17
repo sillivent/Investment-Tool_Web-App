@@ -1,7 +1,8 @@
 // api/getEquityInfo.js
 import yahooFinance from "yahoo-finance2";
 
-export default async function (context, req) {
+//export default async function (context, req) {
+module.exports = async function (context, req) {
   const symbol = (req.query.symbol || req.body.symbol || "").toUpperCase();
   
   if (!symbol) {
