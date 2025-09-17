@@ -17,6 +17,7 @@
             border-collapse: collapse;
             width: 100%;
             table-layout: fixed; /* Ensure columns are fixed width */
+            font-size: 12px; /* Reduce font size throughout the table */
         }
         th,
         td {
@@ -27,6 +28,30 @@
         }
         th {
             min-width: 80px; /* Set minimum width for headers */
+        }
+        th:nth-child(2) {
+            min-width: 200px; /* Keep header width */
+            font-size: 12px; /* Keep header font size normal */
+        }
+        td:nth-child(2) {
+            min-width: 200px; /* Keep cell width */
+        }
+        td:nth-child(2) input {
+            width: 100%; /* Ensure input fits within cell */
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-size: 11px; /* Adjust font size for date input text */
+        }
+        th:nth-child(11),
+        td:nth-child(11) {
+            min-width: 200px; /* Further increase width for Dividend Frequency column to fully fit dropdown */
+        }
+        td:nth-child(11) select {
+            width: 100%; /* Ensure dropdown fits within cell */
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
         input {
             width: 100%;
@@ -123,6 +148,7 @@
                     <th>Dividend Frequency</th>
                     <th>Dividend Payout</th>
                     <th>Total Dividend Payout</th>
+                    <th title="Dividend Re-Investment Program Select this button if the quantity entered are shares bought from dividends being automatically re-invested by the broker">DRIP</th>
                     <th>Actions</th>
                 </tr>
             </thead>

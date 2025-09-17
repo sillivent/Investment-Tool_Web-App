@@ -1,5 +1,5 @@
-- [x] Add AI-themed favicon to frontend/index.html
-- [x] Add AI-themed favicon to frontend/portfolioUpload.html
-- [x] Add AI-themed favicon to frontend/editable_table.html
-- [x] Add AI-themed favicon to frontend/test_static.html
-- [x] Test the favicon by running the server and checking browser tabs
+- [x] Add "DRIP" column header in frontend/editable_table.html between "Total Dividend Payout" and "Actions" with tooltip title.
+- [ ] Update columns array in frontend/editable_table.js to include "DRIP" after "Total Dividend Payout".
+- [ ] Modify createInputElement function in frontend/editable_table.js to handle "DRIP" column with a radio button input.
+- [ ] Update createRow function in frontend/editable_table.js to append the radio button for "DRIP" column.
+- [ ] Test the changes by running the server and verifying the new column appears with radio buttons and tooltip.

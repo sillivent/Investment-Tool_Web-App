@@ -9,46 +9,36 @@ document.addEventListener("DOMContentLoaded", () => {
     const rows = tableBody.querySelectorAll('tr');
     let totalQty = 0;
     let totalCostBasis = 0;
+    let adjustedTotalCostBasis = 0;
     let totalDividendPayout = 0;
     let totalValue = 0;
     let totalDividendAnnualIncome = 0;
-    let sumDividendYieldOnCosts = 0;
-    let sumDividendYield = 0;
-    let countDividendYieldOnCosts = 0;
-    let countDividendYield = 0;
 
     rows.forEach(row => {
       const qty = parseFloat(row.cells[5].querySelector('input').value) || 0;
       const costBasis = parseFloat(row.cells[7].querySelector('input').value) || 0;
       const dividendPayout = parseFloat(row.cells[11].querySelector('input').value) || 0;
       const value = parseFloat(row.cells[6].querySelector('input').value) || 0;
-      const dividendYieldOnCosts = parseFloat(row.cells[9].querySelector('input').value);
-      const dividendYield = parseFloat(row.cells[8].querySelector('input').value);
+      const dripChecked = row.cells[13].querySelector('input').checked;
 
       totalQty += qty;
       totalCostBasis += costBasis;
+      if (!dripChecked) {
+        adjustedTotalCostBasis += costBasis;
+      }
       totalDividendPayout += dividendPayout;
       totalValue += value;
 
       // Calculate total dividend annual income = sum of total dividend payout (which is dividend payout * qty * multiplier)
       // totalDividendPayout is per share dividend payout, so multiply by qty and frequency multiplier
-      const frequency = row.cells[10].querySelector('input').value || "Quarterly";
+      const frequency = row.cells[10].querySelector('select').value || "Quarterly";
       const multiplier = getDividendMultiplier(frequency);
       const totalDividendPayoutAnnual = dividendPayout * qty * multiplier;
       totalDividendAnnualIncome += totalDividendPayoutAnnual;
-
-      if (!isNaN(dividendYieldOnCosts)) {
-        sumDividendYieldOnCosts += dividendYieldOnCosts;
-        countDividendYieldOnCosts++;
-      }
-      if (!isNaN(dividendYield)) {
-        sumDividendYield += dividendYield;
-        countDividendYield++;
-      }
     });
 
-    const avgDividendYieldOnCosts = countDividendYieldOnCosts > 0 ? (sumDividendYieldOnCosts / countDividendYieldOnCosts) : 0;
-    const avgDividendYield = countDividendYield > 0 ? (sumDividendYield / countDividendYield) : 0;
+    const portfolioDividendYieldOnCosts = adjustedTotalCostBasis > 0 ? (totalDividendAnnualIncome / adjustedTotalCostBasis) * 100 : 0;
+    const portfolioDividendYield = totalValue > 0 ? (totalDividendAnnualIncome / totalValue) * 100 : 0;
 
     const aggregateBody = document.querySelector("#aggregateTable tbody");
     aggregateBody.innerHTML = '';
@@ -59,8 +49,8 @@ document.addEventListener("DOMContentLoaded", () => {
       <td>${totalDividendPayout.toFixed(2)}</td>
       <td>${totalValue.toFixed(2)}</td>
       <td>${totalDividendAnnualIncome.toFixed(2)}</td>
-      <td>${avgDividendYieldOnCosts.toFixed(2)}</td>
-      <td>${avgDividendYield.toFixed(2)}</td>
+      <td>${portfolioDividendYieldOnCosts.toFixed(2)}</td>
+      <td>${portfolioDividendYield.toFixed(2)}</td>
     `;
     aggregateBody.appendChild(row);
   }
@@ -114,6 +104,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Helper function to create input element with proper configuration
   function createInputElement(col, symbol, qty, cost) {
+    if (col === "Dividend Frequency") {
+      const select = document.createElement("select");
+      const options = ["Monthly", "Quarterly", "Semiannually", "Annually"];
+      options.forEach(option => {
+        const opt = document.createElement("option");
+        opt.value = option;
+        opt.textContent = option;
+        select.appendChild(opt);
+      });
+      return select;
+    }
+
+    if (col === "DRIP") {
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      return checkbox;
+    }
+
     const input = document.createElement("input");
 
     if (col === "Transaction Date") {
@@ -158,10 +166,15 @@ document.addEventListener("DOMContentLoaded", () => {
         // Set Dividend Frequency from API or default to blank if not available
         const validFrequencies = ["Monthly", "Quarterly", "Semiannually", "Annually"];
         let frequency = "";
-        if (dividendFrequencyText && validFrequencies.includes(dividendFrequencyText)) {
-          frequency = dividendFrequencyText;
+        if (dividendFrequencyText) {
+          // Normalize frequency strings
+          if (dividendFrequencyText === "Semi-Annual") {
+            frequency = "Semiannually";
+          } else if (validFrequencies.includes(dividendFrequencyText)) {
+            frequency = dividendFrequencyText;
+          }
         }
-        row.cells[10].querySelector('input').value = frequency;
+        row.cells[10].querySelector('select').value = frequency;
 
         // Calculate Dividend Payout per share based on frequency
         let dividendPayoutPerShare = 0;
@@ -212,7 +225,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const qty = parseFloat(row.cells[5].querySelector('input').value) || 0;
     const currentPrice = parseFloat(row.cells[2].querySelector('input').value) || 0;
     const dividendPayoutPerShare = parseFloat(row.cells[11].querySelector('input').value) || 0;
-    const frequency = row.cells[10].querySelector('input').value;
+    const frequency = row.cells[10].querySelector('select').value;
 
     // Update Cost Basis
     const costBasis = pricePaid * qty;
@@ -229,7 +242,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Update Change in Value (Value - Cost Basis)
     const changeInValue = value - costBasis;
-    row.cells[3].querySelector('input').value = changeInValue.toFixed(2);
+    const changeInput = row.cells[3].querySelector('input');
+    changeInput.value = changeInValue.toFixed(2);
+    // Apply color styling based on value
+    changeInput.classList.remove('positive', 'negative');
+    if (changeInValue > 0) {
+      changeInput.classList.add('positive');
+    } else if (changeInValue < 0) {
+      changeInput.classList.add('negative');
+    }
 
     // Recalculate Dividend Yield on Costs (Total Dividend Payout / Cost Basis * 100)
     if (costBasis && totalDividendPayout) {
@@ -257,7 +278,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const columns = [
       "Ticker Symbol", "Transaction Date", "Current Price", "Change in Value", "Price Paid",
       "Quantity", "Value", "Cost Basis", "Dividend Yield", "Dividend Yield on Costs",
-      "Dividend Frequency", "Dividend Payout", "Total Dividend Payout"
+      "Dividend Frequency", "Dividend Payout", "Total Dividend Payout", "DRIP"
     ];
 
     columns.forEach((col, index) => {
@@ -278,9 +299,17 @@ document.addEventListener("DOMContentLoaded", () => {
       if (col === "Price Paid" || col === "Quantity" || col === "Current Price") {
         input.addEventListener("input", () => updateCalculations(row));
       }
+      if (col === "Dividend Frequency") {
+        const eventType = input.tagName === "SELECT" ? "change" : "input";
+        input.addEventListener(eventType, () => updateCalculations(row));
+      }
 
       if (col === "Cost Basis") {
         input.addEventListener("input", () => updateCalculations(row));
+      }
+
+      if (col === "DRIP") {
+        input.addEventListener("change", () => updateAggregate());
       }
 
       cell.appendChild(input);
